@@ -1,3 +1,9 @@
+NAME
+    Email::Filter::Rules - Simple Rules for Routing Mail with Email::Filter
+
+VERSION
+    1.11
+
 SYNOPSIS
       #!/usr/bin/perl -w
       use strict;
@@ -87,6 +93,19 @@ USAGE
 
     So thats it, short, simple, and to the point. No more boucing e-mails by
     editing my filter directly. :)
+
+CONSTRUCTOR
+  Email::Filter::Rules->new( rules => $rules )
+    * rules
+        Can be a scalar, array reference, or a file name name.
+
+    * debug
+        Boolean to turn on warnings during apply_rules
+
+METHODS
+  $efr->apply_rules( $email )
+    Pass in an e-mail object and attempt to call methods you defined in your
+    rules file on it.
 
 AUTHOR
     Copyright 2005 Jeff Bisbee <jbisbee@cpan.org>

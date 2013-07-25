@@ -1,9 +1,11 @@
 Changes
 lib/Email/Filter/Rules.pm
-LICENSE
 Makefile.PL
 MANIFEST
 META.yml			Module meta-data (added by MakeMaker)
 README
 t/001_load.t
-Todo
+t/002_coverage.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
