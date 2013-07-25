@@ -1,11 +1,12 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Email-Filter-Rules
-version:      1
+version:      1.1
 version_from: lib/Email/Filter/Rules.pm
 installdirs:  site
 requires:
+    Email::Filter:                 0
     Test::Simple:                  0.44
 
 distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.24
+generated_by: ExtUtils::MakeMaker version 6.30

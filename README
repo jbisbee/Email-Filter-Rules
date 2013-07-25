@@ -1,7 +1,3 @@
-NAME
-    Email::Filter::Rules - Simple Rules for Routing Mail with
-    Email::Filter/Mail::Audit
-
 SYNOPSIS
       #!/usr/bin/perl -w
       use strict;
@@ -24,7 +20,7 @@ SYNOPSIS
     Where the 'rules' can be a filename, array ref, or scalar and looks like
     this
 
-      # DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> SUBSTRING
+      # DESTINATION FOLDER <space> Email::Filter->$METHOD(S) <space> SUBSTRING
   
       # Linux - FLUX
       lists/linux/flux/linux        to:cc linux@flux.org
@@ -68,10 +64,10 @@ DESCRIPTION
 
 USAGE
     Simply put, a rule consists of a destination folder, one to many
-    Mail::Audit method names, and a substring to test the result of the
+    Email::Filter method names, and a substring to test the result of the
     method call.
 
-      DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> SUBSTRING
+      DESTINATION FOLDER <space> Email::Filter->$METHOD(S) <space> SUBSTRING
 
     where a rule looks like this
 
@@ -86,17 +82,14 @@ USAGE
 
       lists/perl/pm/southflorida
 
-    and now I have the mail folder, I can tell the Mail::Audit object to
+    and now I have the mail folder, I can tell the Email::Filter object to
     accept to that folder.
 
     So thats it, short, simple, and to the point. No more boucing e-mails by
     editing my filter directly. :)
 
 AUTHOR
-      Jeff Bisbee
-      CPAN ID: JBISBEE
-      jbisbee@cpan.org
-      http://search.cpan.org/author/JBISBEE/
+    Copyright 2005 Jeff Bisbee <jbisbee@cpan.org>
 
 COPYRIGHT
     This program is free software; you can redistribute it and/or modify it
@@ -106,5 +99,5 @@ COPYRIGHT
     with this module.
 
 SEE ALSO
-    Email::Filter
+    Email::Filter, Email::Simple
 

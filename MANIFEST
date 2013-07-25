@@ -1,16 +1,9 @@
+Changes
+lib/Email/Filter/Rules.pm
+LICENSE
+Makefile.PL
 MANIFEST
-LICENSE
+META.yml			Module meta-data (added by MakeMaker)
 README
-Todo
-Changes
-lib/Email/Filter/Rules.pm
 t/001_load.t
-Makefile.PL
-LICENSE
-README
 Todo
-Changes
-lib/Email/Filter/Rules.pm
-t/001_load.t
-Makefile.PL
-META.yml                                 Module meta-data (added by MakeMaker)

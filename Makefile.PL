@@ -3,10 +3,12 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     NAME         => 'Email::Filter::Rules',
-    VERSION_FROM => 'lib/Email/Filter/Rules.pm', # finds $VERSION
+    VERSION_FROM => 'lib/Email/Filter/Rules.pm',        # finds $VERSION
     AUTHOR       => 'Jeff Bisbee (jbisbee@cpan.org)',
-    ABSTRACT     => 'Simple Rules for Routing Mail with Email::Filter/Mail::Audit',
-    PREREQ_PM    => {
-                     'Test::Simple'  => 0.44,
-                    },
+    ABSTRACT     =>
+        'Simple Rules for Routing Mail with Email::Filter/Mail::Audit',
+    PREREQ_PM => {
+        'Test::Simple'  => 0.44,
+        'Email::Filter' => 0,
+    },
 );

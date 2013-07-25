@@ -1,6 +1,3 @@
-#!/usr/bin/perl
-use strict;
-use warnings;
 use Test::More tests => 9;
 
 BEGIN { use_ok( 'Email::Filter' ); }

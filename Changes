@@ -1,22 +1,24 @@
 Revision history for Perl module Email::Filter::Rules
 
-1.0 5/6/2005
+1.1     5/7/2006
+        - Added Email::Filter as a prereq so tests will pass.
+        - Regenerated README to replace out of date README
+
+1.0     5/6/2005
 	- Removed Mail::Audit references in favor or Email::Filter only
 	- Added some better testing
 	- Cleaned up the code/pod a bit
 
-0.4 4/5/2004 (Cinco de Mayo - It's Margarita time!!)
+0.4     4/5/2004 (Cinco de Mayo - It's Margarita time!!)
 	- pod2text lib/Email/Filter/Rules.pm > README
 
-0.3 4/5/2004 (Cinco de Mayo - It's Corona time!!)
+0.3     4/5/2004 (Cinco de Mayo - It's Corona time!!)
 	- Changed references to 'REGEX' to 'SUBSTRING' because as Rocco 
 	  Caputo pointed out, its not actually a regular expression.
 	  
-0.2 9/20/2003
+0.2     9/20/2003
 	- fixed an issue were we make sure that the Email::Filter object
-	  can do a method before we call it
+	  can do a method before we call it next unless $ma->can($method);
 
-	     next unless $ma->can($method);
-
-0.01 9/6/2003
+0.01    9/6/2003
 	- original version
