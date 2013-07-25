@@ -1,10 +1,12 @@
 Revision history for Perl module Email::Filter::Rules
 
+0.4 4/5/2004 (Cinco de Mayo - It's Margarita time!!)
+	- pod2text lib/Email/Filter/Rules.pm > README
+
 0.3 4/5/2004 (Cinco de Mayo - It's Corona time!!)
 	- Changed references to 'REGEX' to 'SUBSTRING' because as Rocco 
 	  Caputo pointed out, its not actually a regular expression.
 	  
-
 0.2 9/20/2003
 	- fixed an issue were we make sure that the Email::Filter object
 	  can do a method before we call it

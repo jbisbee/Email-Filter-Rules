@@ -4,7 +4,7 @@ use IO::File;
 
 BEGIN {
     use vars qw ($VERSION);
-    $VERSION     = 0.3;
+    $VERSION     = 0.4;
 }
 
 =head1 NAME

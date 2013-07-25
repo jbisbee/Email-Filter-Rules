@@ -24,7 +24,7 @@ SYNOPSIS
     Where the 'rules' can be a filename, array ref, or scalar and looks like
     this
 
-      # DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> REGEX
+      # DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> SUBSTRING
   
       # Linux - FLUX
       lists/linux/flux/linux        to:cc linux@flux.org
@@ -68,16 +68,16 @@ DESCRIPTION
 
 USAGE
     Simply put, a rule consists of a destination folder, one to many
-    Mail::Audit method names, and a regex to test the result of the method
-    call.
+    Mail::Audit method names, and a substring to test the result of the
+    method call.
 
-      DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> REGEX
+      DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> SUBSTRING
 
     where a rule looks like this
 
       lists/perl/pm/southflorida    to:cc southflorida-pm@mail.pm.org
 
-    each rule is tested and quotemeta is used on the regex
+    each rule is tested and quotemeta is used on the substring
 
       $msg->to =~ /southflorida-pm\@mail\.pm\.org/i
       $msg->cc =~ /southflorida-pm\@mail\.pm\.org/i
