@@ -1,15 +1,74 @@
 package Email::Filter::Rules;
 use strict;
-use IO::File;
+use warnings;
+our $VERSION =  1.0;
 
-BEGIN {
-    use vars qw ($VERSION);
-    $VERSION     = 0.4;
+sub new {
+    my ($class,%args) = @_;
+    return undef unless $args{rules};
+    my @rules = ();
+
+    # added the \n check because I got a warning if a did a -e test on
+    # a scalar containing newlines
+    if ($args{rules} !~ /\n/s && -e $args{rules}) {
+	open my $fh, $args{rules} or die "Can't open file $args{rules}: $!";
+	@rules = <$fh>;
+	close $fh;
+    }
+    elsif (ref $args{rules} eq "ARRAY") {
+	@rules = @{$args{rules}};
+    }
+    else {
+	@rules = split "\n", $args{rules};
+    }
+    return unless scalar @rules;
+
+    my @rule_data = ();
+
+    for my $line (@rules) {
+	chomp($line);
+	next if $line =~ /^#/;
+	my ($folder,$methods,$substring) = split(/\s+/, $line, 3);
+	next unless $methods && $folder && $substring;
+	my $escaped_substring = quotemeta($substring);
+	my @methods = split(/\:/, $methods);
+	push @rule_data, {
+		methods   => \@methods,
+		substring => $escaped_substring,
+		folder    => $folder,
+	    };
+    }
+
+    my $obj = {
+	rule_data  => \@rule_data,
+	debug      => $args{debug},
+    };
+
+    return bless $obj, $class;
 }
 
+sub apply_rules {
+    my ($self,$ma) = @_;
+    for my $rule (@{$self->{rule_data}}) {
+	for my $method (@{$rule->{methods}}) {
+	    my $substring = $rule->{substring};
+	    next unless $ma->can($method);
+	    my $testing = $ma->$method;
+	    next unless $testing;
+	    warn "testing $method \"$testing\" with $substring\n" if $self->{debug};
+	    # going to keep the 'i' now, may pass this in somehow
+	    return $rule->{folder} if $testing =~ /$substring/is;
+	}
+    }
+    return undef;
+}
+
+1;
+
+__DATA__
 =head1 NAME
 
-Email::Filter::Rules - Simple Rules for Routing Mail with Email::Filter/Mail::Audit
+Email::Filter::Rules - Simple Rules for Routing Mail with Email::Filter
 
 =head1 SYNOPSIS
 
@@ -33,7 +92,7 @@ Email::Filter::Rules - Simple Rules for Routing Mail with Email::Filter/Mail::Au
 
 Where the 'rules' can be a filename, array ref, or scalar and looks like this
 
-  # DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> SUBSTRING
+  # DESTINATION FOLDER <space> Email::Filter->$METHOD(S) <space> SUBSTRING
   
   # Linux - FLUX
   lists/linux/flux/linux        to:cc linux@flux.org
@@ -78,10 +137,10 @@ procmail recipe or some cryptic piece of junk.
 
 =head1 USAGE
 
-Simply put, a rule consists of a destination folder, one to many Mail::Audit method
+Simply put, a rule consists of a destination folder, one to many Email::Filter method
 names, and a substring to test the result of the method call.
 
-  DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> SUBSTRING
+  DESTINATION FOLDER <space> Email::Filter->$METHOD(S) <space> SUBSTRING
 
 where a rule looks like this
 
@@ -96,7 +155,7 @@ and the destination folder is returned for the first matching test
 
   lists/perl/pm/southflorida
 
-and now I have the mail folder, I can tell the Mail::Audit object to accept to
+and now I have the mail folder, I can tell the Email::Filter object to accept to
 that folder.
 
 So thats it, short, simple, and to the point.  No more boucing e-mails by editing
@@ -104,87 +163,19 @@ my filter directly. :)
 
 =head1 AUTHOR
 
-  Jeff Bisbee
-  CPAN ID: JBISBEE
-  jbisbee@cpan.org
-  http://search.cpan.org/author/JBISBEE/
+Copyright 2005 Jeff Bisbee <jbisbee@cpan.org>
 
 =head1 COPYRIGHT
 
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+This program is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.
 
-The full text of the license can be found in the
-LICENSE file included with this module.
-
+The full text of the license can be found in the LICENSE file included with 
+this module.
 
 =head1 SEE ALSO
 
-L<Email::Filter>
+L<Email::Filter>, L<Email::Simple>
 
 =cut
 
-sub new
-{
-    my ($class,%args) = @_;
-    return undef unless $args{rules};
-    my @rules = ();
-
-    # added the \n check because I got a warning if a did a -e test on
-    # a scalar containing newlines
-    if ($args{rules} !~ /\n/s && -e $args{rules}) {
-	my $fh = IO::File->new($args{rules}) or die "Can't open file $args{rules}: $!";
-	@rules = <$fh>;
-	$fh->close();
-    }
-    elsif (ref $args{rules} eq "ARRAY") {
-	@rules = @{$args{rules}};
-    }
-    else {
-	@rules = split "\n", $args{rules};
-    }
-    return unless scalar @rules;
-
-    my @rule_data = ();
-
-    for my $line (@rules) {
-	chomp($line);
-	next if $line =~ /^#/;
-	my ($folder,$methods,$substring) = split(/\s+/, $line, 3);
-	next unless $methods && $folder && $substring;
-	my $escaped_substring = quotemeta($substring);
-	my @methods = split(/\:/, $methods);
-	push @rule_data, {
-		methods   => \@methods,
-		substring => $escaped_substring,
-		folder    => $folder,
-	    };
-    }
-
-    my $obj = {
-	rule_data  => \@rule_data,
-	debug      => $args{debug},
-    };
-
-    return bless $obj, $class;
-}
-
-sub apply_rules
-{
-    my ($self,$ma) = @_;
-    for my $rule (@{$self->{rule_data}}) {
-	for my $method (@{$rule->{methods}}) {
-	    my $substring = $rule->{substring};
-	    next unless $ma->can($method);
-	    my $testing = $ma->$method;
-	    warn "testing $method \"$testing\" with $substring\n" if $self->{debug};
-	    # going to keep the 'i' now, may pass this in somehow
-	    if ($ma->$method =~ /$substring/i) {
-		return $rule->{folder};
-	    }
-	}
-    }
-    return undef;
-}
-
-1;
