@@ -8,11 +8,11 @@ Email::Filter::Rules - Simple Rules for Routing Mail with Email::Filter
 
 =head1 VERSION
 
-1.12
+1.121
 
 =cut
 
-our $VERSION =  1.12;
+our $VERSION =  1.121;
 
 =head1 SYNOPSIS
 

@@ -11,4 +11,5 @@ WriteMakefile(
         'Test::Simple'  => 0.44,
         'Email::Filter' => 0,
     },
+    LICENSE => 'perl',
 );
