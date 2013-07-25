@@ -4,7 +4,7 @@ use IO::File;
 
 BEGIN {
     use vars qw ($VERSION);
-    $VERSION     = 0.2;
+    $VERSION     = 0.3;
 }
 
 =head1 NAME
@@ -33,7 +33,7 @@ Email::Filter::Rules - Simple Rules for Routing Mail with Email::Filter/Mail::Au
 
 Where the 'rules' can be a filename, array ref, or scalar and looks like this
 
-  # DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> REGEX
+  # DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> SUBSTRING
   
   # Linux - FLUX
   lists/linux/flux/linux        to:cc linux@flux.org
@@ -79,15 +79,15 @@ procmail recipe or some cryptic piece of junk.
 =head1 USAGE
 
 Simply put, a rule consists of a destination folder, one to many Mail::Audit method
-names, and a regex to test the result of the method call.
+names, and a substring to test the result of the method call.
 
-  DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> REGEX
+  DESTINATION FOLDER <space> Mail::Audit->$METHOD(S) <space> SUBSTRING
 
 where a rule looks like this
 
   lists/perl/pm/southflorida    to:cc southflorida-pm@mail.pm.org
 
-each rule is tested and quotemeta is used on the regex
+each rule is tested and quotemeta is used on the substring
 
   $msg->to =~ /southflorida-pm\@mail\.pm\.org/i
   $msg->cc =~ /southflorida-pm\@mail\.pm\.org/i
@@ -150,14 +150,14 @@ sub new
     for my $line (@rules) {
 	chomp($line);
 	next if $line =~ /^#/;
-	my ($folder,$methods,$regex,) = split(/\s+/, $line, 3);
-	next unless $methods && $folder && $regex;
-	my $quoted_regex = quotemeta($regex);
+	my ($folder,$methods,$substring) = split(/\s+/, $line, 3);
+	next unless $methods && $folder && $substring;
+	my $escaped_substring = quotemeta($substring);
 	my @methods = split(/\:/, $methods);
 	push @rule_data, {
-		methods  => \@methods,
-		regex    => $quoted_regex,
-		folder   => $folder,
+		methods   => \@methods,
+		substring => $escaped_substring,
+		folder    => $folder,
 	    };
     }
 
@@ -174,12 +174,12 @@ sub apply_rules
     my ($self,$ma) = @_;
     for my $rule (@{$self->{rule_data}}) {
 	for my $method (@{$rule->{methods}}) {
-	    my $regex = $rule->{regex};
+	    my $substring = $rule->{substring};
 	    next unless $ma->can($method);
 	    my $testing = $ma->$method;
-	    warn "testing $method \"$testing\" with $regex\n" if $self->{debug};
+	    warn "testing $method \"$testing\" with $substring\n" if $self->{debug};
 	    # going to keep the 'i' now, may pass this in somehow
-	    if ($ma->$method =~ /$regex/i) {
+	    if ($ma->$method =~ /$substring/i) {
 		return $rule->{folder};
 	    }
 	}
