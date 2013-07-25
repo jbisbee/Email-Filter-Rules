@@ -1,6 +1,10 @@
 Revision history for Perl module Email::Filter::Rules
 
+0.2 9/20/2003
+	- fixed an issue were we make sure that the Email::Filter object
+	  can do a method before we call it
+
+	     next unless $ma->can($method);
+
 0.01 9/6/2003
 	- original version
-
-

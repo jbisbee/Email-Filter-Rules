@@ -4,7 +4,7 @@ use IO::File;
 
 BEGIN {
     use vars qw ($VERSION);
-    $VERSION     = 0.01;
+    $VERSION     = 0.2;
 }
 
 =head1 NAME
@@ -175,6 +175,7 @@ sub apply_rules
     for my $rule (@{$self->{rule_data}}) {
 	for my $method (@{$rule->{methods}}) {
 	    my $regex = $rule->{regex};
+	    next unless $ma->can($method);
 	    my $testing = $ma->$method;
 	    warn "testing $method \"$testing\" with $regex\n" if $self->{debug};
 	    # going to keep the 'i' now, may pass this in somehow
