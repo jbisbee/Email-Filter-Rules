@@ -1,6 +1,75 @@
 package Email::Filter::Rules;
 use strict;
 use warnings;
+use constant RULE_SPLIT_LIMIT => 3;
+
+our $VERSION =  1.2;
+
+sub new {
+    my ( $class, %args ) = @_;
+    return unless $args{rules};
+    my @rules = ();
+
+    # added the \n check because I got a warning if a did a -e test on
+    # a scalar containing newlines
+    if ( $args{rules} !~ /\n/s && -e $args{rules} ) {
+        open my $fh, '<', $args{rules} or die "Can't open file $args{rules}: $!";
+        @rules = <$fh>;
+        close $fh;
+    }
+    elsif ( ref $args{rules} eq 'ARRAY' ) {
+        @rules = @{ $args{rules} };
+    }
+    else {
+        @rules = split /\n/, $args{rules};
+    }
+    return unless scalar @rules;
+
+    my @rule_data = ();
+
+    for my $line (@rules) {
+        chomp($line);
+        next if $line =~ /^#/;
+        my ( $folder, $methods, $substring ) = split( /\s+/, $line, RULE_SPLIT_LIMIT );
+        next unless $methods && $folder && $substring;
+        my $escaped_substring = quotemeta($substring);
+        my @methods = split( /\:/, $methods );
+        push @rule_data, {
+            methods   => \@methods,
+            substring => $escaped_substring,
+            folder    => $folder,
+        };
+    }
+
+    my $obj = {
+        rule_data => \@rule_data,
+        debug     => $args{debug},
+    };
+
+    return bless $obj, $class;
+}
+
+sub apply_rules {
+    my ( $self, $email ) = @_;
+    for my $rule ( @{ $self->{rule_data} } ) {
+        for my $method ( @{ $rule->{methods} } ) {
+            my $substring = $rule->{substring};
+            next unless $email->can($method);
+            my $testing = $email->$method;
+            next unless $testing;
+            warn "testing $method \"$testing\" with $substring\n"
+                if $self->{debug};
+
+            # going to keep the 'i' now, may pass this in somehow
+            return $rule->{folder} if $testing =~ /$substring/is;
+        }
+    }
+    return;
+}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -8,11 +77,7 @@ Email::Filter::Rules - Simple Rules for Routing Mail with Email::Filter
 
 =head1 VERSION
 
-1.121
-
-=cut
-
-our $VERSION =  1.121;
+1.2
 
 =head1 SYNOPSIS
 
@@ -121,78 +186,12 @@ Boolean to turn on warnings during apply_rules
 
 =back
 
-=cut
-
-sub new {
-    my ( $class, %args ) = @_;
-    return undef unless $args{rules};
-    my @rules = ();
-
-    # added the \n check because I got a warning if a did a -e test on
-    # a scalar containing newlines
-    if ( $args{rules} !~ /\n/s && -e $args{rules} ) {
-        open my $fh, $args{rules} or die "Can't open file $args{rules}: $!";
-        @rules = <$fh>;
-        close $fh;
-    }
-    elsif ( ref $args{rules} eq "ARRAY" ) {
-        @rules = @{ $args{rules} };
-    }
-    else {
-        @rules = split "\n", $args{rules};
-    }
-    return unless scalar @rules;
-
-    my @rule_data = ();
-
-    for my $line (@rules) {
-        chomp($line);
-        next if $line =~ /^#/;
-        my ( $folder, $methods, $substring ) = split( /\s+/, $line, 3 );
-        next unless $methods && $folder && $substring;
-        my $escaped_substring = quotemeta($substring);
-        my @methods = split( /\:/, $methods );
-        push @rule_data, {
-            methods   => \@methods,
-            substring => $escaped_substring,
-            folder    => $folder,
-        };
-    }
-
-    my $obj = {
-        rule_data => \@rule_data,
-        debug     => $args{debug},
-    };
-
-    return bless $obj, $class;
-}
-
 =head1 METHODS
 
 =head2 $efr->apply_rules( $email )
 
 Pass in an e-mail object and attempt to call methods you defined in your
 rules file on it.
-
-=cut
-
-sub apply_rules {
-    my ( $self, $email ) = @_;
-    for my $rule ( @{ $self->{rule_data} } ) {
-        for my $method ( @{ $rule->{methods} } ) {
-            my $substring = $rule->{substring};
-            next unless $email->can($method);
-            my $testing = $email->$method;
-            next unless $testing;
-            warn "testing $method \"$testing\" with $substring\n"
-                if $self->{debug};
-
-            # going to keep the 'i' now, may pass this in somehow
-            return $rule->{folder} if $testing =~ /$substring/is;
-        }
-    }
-    return undef;
-}
 
 =head1 AUTHOR
 
@@ -210,6 +209,3 @@ this module.
 
 L<Email::Filter>, L<Email::Simple>
 
-=cut
-
-1;

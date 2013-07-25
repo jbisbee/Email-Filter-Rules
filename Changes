@@ -1,5 +1,13 @@
 Revision history for Perl module Email::Filter::Rules
 
+1.2     6/30/2008
+        - update README
+        - perlcritic updates
+            - moved pod after __END__ block
+            - remove 'return undef'
+            - 
+        - cleaned up tests
+
 1.121   11/5/2006
         - No need to update, cpants META.yml fix, needed to update to
           ExtUtils::MakeMaker 6.31 for META.yml update
