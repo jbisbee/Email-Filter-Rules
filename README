@@ -2,7 +2,7 @@ NAME
     Email::Filter::Rules - Simple Rules for Routing Mail with Email::Filter
 
 VERSION
-    1.11
+    1.12
 
 SYNOPSIS
       #!/usr/bin/perl -w
